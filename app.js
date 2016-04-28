@@ -1,16 +1,15 @@
-// Shorthand for defining a level (temporary)
-var level = [
-  [[1,0,0], [1,0,0], [1,0,0], [0,0,0], [1,0,0], [1,0,0], [0,0,0]],
-  [[1,0,0], [1,0,0], [1,1,0], [1,1,1], [1,0,0], [1,1,0], [1,0,0]],
-  [[0,0,0], [1,0,0], [1,0,0], [1,1,0], [1,1,1], [1,0,0], [1,0,0]],
-  [[0,0,0], [1,0,0], [1,0,1], [1,0,0], [1,0,0], [1,0,0], [0,0,0]],
-  [[0,0,0], [0,0,0], [1,0,0], [1,0,0], [0,0,0], [1,0,0], [1,0,0]],
-];
-
-// Maps data from shorthand above to tile objects
-var data = level.map(function(row, y) {
-  return row.map(function(tile, x) {
-    return { position: V2(x, y), ground: !!tile[0], walls: { x: !!tile[1], y: !!tile[2] }, highlight: 0 };
+// Creates a randomised level
+var data = _.times(16, function(y) {
+  return _.times(16, function(x) {
+    return {
+      position: V2(x, y),
+      ground: x === 0 && y === 0 ? 1 : Math.random() > 0.05,
+      walls: {
+        x: x === 0 && y === 0 ? 0 : Math.random() > 0.8,
+        y: x === 0 && y === 0 ? 0 : Math.random() > 0.8,
+      },
+      highlight: 0,
+    };
   });
 });
 
