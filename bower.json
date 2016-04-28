@@ -6,8 +6,8 @@
   ],
   "description": "Prototype zombie game",
   "dependencies": {
-    "lodash": "4.11.2",
-    "three.js": "0.76.0"
+    "threejs": "r76",
+    "lodash": "4.11.2"
   },
   "private": true
 }
