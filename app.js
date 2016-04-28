@@ -21,51 +21,21 @@ var current = level.get(0, 0);
 
 var temp = V2();
 
-// Calculate tile neighbours
-level.iterate(function(tile) {
-  var position = tile.position;
+level.computeNeighbours();
 
-  tile.neighbours = [];
-
-  if (!level.get(position).ground) return;
-
-  Level.adjacents.map(function(direction) {
-    var wall = level.getWallsInDirection(position, direction)[0];
-    if (level.get(temp.copy(position).add(direction)).ground && !wall) {
-      tile.neighbours.push(direction);
-    }
-  });
-
-  Level.diagonals.map(function(direction) {
-    var walls = level.getWallsInDirection(position, direction);
-
-    var adjacentTiles = [
-      level.get(temp.copy(position).add(direction)),
-      level.get(temp.copy(position).add(direction.components[0])),
-      level.get(temp.copy(position).add(direction.components[1])),
-    ];
-
-    if (!_.some(adjacentTiles, ['ground', false]) && !_.some(walls)) {
-      tile.neighbours.push(direction);
-    }
-  });
+var entities = _.times(500, function() {
+  return new Entity(16);
 });
-
-var entities = [new Entity(16), new Entity(16), new Entity(16)];
 entities.map(function(entity) {
   entity.setPosition(current);
-  setTimeout(function() {
-    setInterval(function() {
-      level.findPath(entity, level.random());
-    }, Math.random() * 3000);
-  }, Math.random() * 1000);
+  entity.path = [current];
 });
 
-current.highlight = 3;
+current.highlight = 500;
 
 var step = function() {
   entities.map(function(entity) {
-    entity.update();
+    entity.update(level);
   });
   renderer.render(level, entities);
   window.requestAnimationFrame(step);

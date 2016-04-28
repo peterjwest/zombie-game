@@ -56,35 +56,22 @@ Level.diagonals = [
 ];
 
 var temp = V2();
-var temp2 = V2();
 
 // Gets the walls between a tile and an adjacent tile
-Level.prototype.getWallsInDirection = function(position, direction) {
+Level.prototype.wallInDirection = function(position, direction) {
   // Moving north/south
   if (direction.x === 0) {
     temp.copy(position);
     if (direction.y < 0) temp.add(direction);
-    return [this.get(temp).walls.x];
+    return this.get(temp).walls.x;
   }
 
   // Moving east/west
   if (direction.y === 0) {
     temp.copy(position);
     if (direction.x < 0) temp.add(direction);
-    return [this.get(temp).walls.y];
+    return this.get(temp).walls.y;
   }
-
-  // If we are this far, the direction must be diagonal
-  // First work out the minimum corner of the two tiles
-  var corner = temp.copy(position).add(direction).min(position);
-
-  // Take the relevant walls
-  return [
-    this.get(corner).walls.x,
-    this.get(corner).walls.y,
-    this.get(temp2.copy(corner).add(temp.copy(direction.components[0]).abs())).walls.x,
-    this.get(temp2.copy(corner).add(temp.copy(direction.components[1]).abs())).walls.y,
-  ];
 };
 
 Level.prototype.findPath = function(entity, target) {
@@ -96,4 +83,41 @@ Level.prototype.findPath = function(entity, target) {
 Level.prototype.random = function() {
   var row = this.data[Math.floor(Math.random() * this.data.length)];
   return row[Math.floor(Math.random() * row.length)];
+};
+
+Level.prototype.computeNeighbours = function() {
+  // Calculate adjacent neighbours
+  level.iterate(function(tile) {
+    var position = tile.position;
+    tile.neighbours = [];
+
+    if (!level.get(position).ground) return;
+
+    Level.adjacents.forEach(function(direction) {
+      var wall = level.wallInDirection(position, direction);
+      if (level.get(temp.copy(position).add(direction)).ground && !wall) {
+        tile.neighbours.push(direction);
+      }
+    });
+  });
+
+  // Calculate diagonal neighbours
+  level.iterate(function(tile) {
+    var position = tile.position;
+
+    Level.diagonals.forEach(function(direction) {
+      var neighbour = level.get(temp.copy(position).add(direction));
+      var componentNeighbours = [
+        level.get(temp.copy(position).add(direction.components[0])),
+        level.get(temp.copy(position).add(direction.components[1])),
+      ];
+
+      if (_.intersection(tile.neighbours, direction.components).length === 2
+        && _.includes(componentNeighbours[0].neighbours, direction.components[1])
+        && _.includes(componentNeighbours[1].neighbours, direction.components[0])
+      ) {
+        tile.neighbours.push(direction);
+      }
+    });
+  });
 };
