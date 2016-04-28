@@ -14,7 +14,7 @@ var computePath = function(node) {
   var current = node;
   var path = [];
   while (current.path.parent) {
-    path.unshift(current);
+    path.push(current);
     current = current.path.parent;
   }
   return path;
