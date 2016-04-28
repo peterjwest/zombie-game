@@ -1,0 +1,17 @@
+<!doctype html>
+<title>Game</title>
+<style>
+  .tile { width: 40px; height: 40px; background: dimgrey; float: left; padding: 1px; }
+  .tile--line-start { clear: left; }
+  .tile--solid { background: olivedrab; }
+  .tile--wall-x { border-bottom: 1px solid saddlebrown; padding-top: 0; }
+  .tile--wall-y { border-right: 1px solid saddlebrown; padding-right: 0; }
+  .tile--current { background: lightskyblue; }
+</style>
+<body>
+<script src="bower_components/lodash/lodash.js"></script>
+<script src="bower_components/three.js/build/three.js"></script>
+<script src="three.utils.js"></script>
+<script src="binary-heap.js"></script>
+<script src="pathfind.js"></script>
+<script src="app.js"></script>
