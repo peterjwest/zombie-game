@@ -13,7 +13,7 @@ Entity.prototype.setPosition = function(tile) {
   this.position.add(V2((0.25 + Math.random()/2) * this.tileSize - 2, (0.25 + Math.random()/2) * this.tileSize - 2))
 };
 
-Entity.prototype.update = function() {
+Entity.prototype.update = function(level) {
   if (this.path.length) {
     var target = _.last(this.path);
     var direction = temp.copy(target.position).sub(this.current.position);
@@ -22,6 +22,15 @@ Entity.prototype.update = function() {
       this.current.highlight--;
       this.current = this.path.pop();
       this.current.highlight++;
+
+      if (!this.path.length) {
+        var entity = this;
+        setTimeout(function() {
+          while (!entity.path.length) {
+            level.findPath(entity, level.random())
+          }
+        }, 500 + Math.random() * 2500);
+      }
     }
   } else {
     this.acceleration.set(0, 0);
