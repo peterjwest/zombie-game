@@ -1,0 +1,13 @@
+{
+  "name": "zombie-game",
+  "homepage": "https://github.com/peterjwest/zombie-game",
+  "authors": [
+    "peterjwest <peterjwest3@gmail.com>"
+  ],
+  "description": "Prototype zombie game",
+  "dependencies": {
+    "lodash": "4.11.2",
+    "three.js": "0.76.0"
+  },
+  "private": true
+}
