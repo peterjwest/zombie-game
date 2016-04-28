@@ -1,17 +1,3 @@
-var level = [
-  [[1,0,0], [1,0,0], [1,0,0], [1,0,0], [1,0,0], [1,0,0], [0,0,0]],
-  [[1,0,0], [1,0,0], [1,1,0], [1,1,1], [1,0,0], [1,1,0], [1,0,0]],
-  [[0,0,0], [1,0,0], [1,0,0], [1,1,0], [1,1,1], [1,0,0], [1,0,0]],
-  [[0,0,0], [1,0,0], [1,0,1], [1,0,0], [1,0,0], [1,0,0], [0,0,0]],
-  [[0,0,0], [0,0,0], [1,0,0], [1,0,0], [0,0,0], [1,0,0], [1,0,0]],
-];
-
-var data = level.map(function(row, y) {
-  return row.map(function(tile, x) {
-    return { position: V2(x, y), ground: !!tile[0], walls: { x: !!tile[1], y: !!tile[2] }};
-  });
-});
-
 var Level = function(data) {
   this.data = data;
 };
@@ -47,6 +33,11 @@ Level.directions = {
   nw: V2(-1, -1),
 };
 
+Level.directions.ne.components = [Level.directions.e, Level.directions.n];
+Level.directions.se.components = [Level.directions.e, Level.directions.s];
+Level.directions.sw.components = [Level.directions.w, Level.directions.s];
+Level.directions.nw.components = [Level.directions.w, Level.directions.n];
+
 // Adjacent tiles
 Level.adjacents = [
   Level.directions.n,
@@ -65,60 +56,77 @@ Level.diagonals = [
 
 var temp = V2();
 
-// Gets walls between a tile and it's adjacent tile in a direction
-Level.prototype.getDirectionWalls = function(pos, dir) {
+// Gets the walls between a tile and an adjacent tile
+Level.prototype.getWallsInDirection = function(position, direction) {
   // Moving north/south
-  if (dir.x === 0) {
-    temp.copy(pos);
-    if (dir.y < 0) temp.add(dir);
+  if (direction.x === 0) {
+    temp.copy(position);
+    if (direction.y < 0) temp.add(direction);
     return [this.get(temp).walls.x];
   }
 
   // Moving east/west
-  if (dir.y === 0) {
-    temp.copy(pos);
-    if (dir.x < 0) temp.add(dir);
+  if (direction.y === 0) {
+    temp.copy(position);
+    if (direction.x < 0) temp.add(direction);
     return [this.get(temp).walls.y];
   }
 
   // If we are this far, the direction must be diagonal
   // First work out the minimum corner of the two tiles
-  var corner = temp.copy(pos).add(dir).min(pos);
+  var corner = temp.copy(position).add(direction).min(position);
 
   // Take the relevant walls
   return [
-    this.get(corner.x, corner.y).walls.x,
-    this.get(corner.x, corner.y).walls.y,
-    this.get(corner.x + 1, corner.y).walls.x,
-    this.get(corner.x, corner.y + 1).walls.y,
+    this.get(corner).walls.x,
+    this.get(corner).walls.y,
+    this.get(corner.clone().add(direction.components[0])).walls.x,
+    this.get(corner.clone().add(direction.components[1])).walls.y,
   ];
 };
+
+// Shorthand for defining a level (temporary)
+var level = [
+  [[1,0,0], [1,0,0], [1,0,0], [1,0,0], [1,0,0], [1,0,0], [0,0,0]],
+  [[1,0,0], [1,0,0], [1,1,0], [1,1,1], [1,0,0], [1,1,0], [1,0,0]],
+  [[0,0,0], [1,0,0], [1,0,0], [1,1,0], [1,1,1], [1,0,0], [1,0,0]],
+  [[0,0,0], [1,0,0], [1,0,1], [1,0,0], [1,0,0], [1,0,0], [0,0,0]],
+  [[0,0,0], [0,0,0], [1,0,0], [1,0,0], [0,0,0], [1,0,0], [1,0,0]],
+];
+
+// Maps data from shorthand above to tile objects
+var data = level.map(function(row, y) {
+  return row.map(function(tile, x) {
+    return { position: V2(x, y), ground: !!tile[0], walls: { x: !!tile[1], y: !!tile[2] }};
+  });
+});
 
 var level = new Level(data);
 
 var current = level.get(0, 0);
-var path = [];
 
 // Render level
 level.iterate(function(tile) {
-  var div = document.createElement('div');
-  div.className = 'tile';
-  if (tile.ground) div.classList.add('tile--solid');
-  if (tile.walls.x) div.classList.add('tile--wall-x');
-  if (tile.walls.y) div.classList.add('tile--wall-y');
-  if (tile.position.x === 0) div.classList.add('tile--line-start');
-  div.addEventListener('click', function() {
-    var route = pathfind(level, current, tile);
-    if (route !== false) {
-      path = _.reverse(route)
-    }
-  });
-  document.body.appendChild(div);
-  tile.element = div;
+  tile.element = document.createElement('div');
+  tile.element.className = 'tile';
+  if (tile === current) tile.element.classList.add('tile--current');
+  if (tile.ground) tile.element.classList.add('tile--solid');
+  if (tile.walls.x) tile.element.classList.add('tile--wall-x');
+  if (tile.walls.y) tile.element.classList.add('tile--wall-y');
+  if (tile.position.x === 0) tile.element.classList.add('tile--line-start');
+  document.body.appendChild(tile.element);
 });
 
-current.element.classList.add('tile--current');
-
+// Animate entity on click
+var path = [];
+level.iterate(function(tile) {
+  tile.element.addEventListener('click', function() {
+    var route = pathfind(level, current, tile);
+    if (route !== false) {
+      path = _.reverse(route);
+    }
+  });
+});
 var last = 0;
 var step = function(timestamp) {
   if (path.length && timestamp > last + 200) {
@@ -140,19 +148,19 @@ level.iterate(function(tile) {
   if (!level.get(position).ground) return;
 
   Level.adjacents.map(function(adjacent) {
-    var wall = level.getDirectionWalls(position, adjacent)[0];
+    var wall = level.getWallsInDirection(position, adjacent)[0];
     if (level.get(temp.copy(position).add(adjacent)).ground && !wall) {
       tile.neighbours.push(adjacent);
     }
   });
 
   Level.diagonals.map(function(adjacent) {
-    var walls = level.getDirectionWalls(position, adjacent);
+    var walls = level.getWallsInDirection(position, adjacent);
 
     var adjacentTiles = [
-      level.get(position.x + adjacent.x, position.y + adjacent.y),
-      level.get(position.x, position.y + adjacent.y),
-      level.get(position.x + adjacent.x, position.y),
+      level.get(temp.copy(position).add(adjacent)),
+      level.get(temp.copy(position).add(adjacent.components[0])),
+      level.get(temp.copy(position).add(adjacent.components[1])),
     ];
 
     if (!_.some(adjacentTiles, ['ground', false]) && !_.some(walls)) {
