@@ -18,6 +18,7 @@ Entity.prototype.update = function(level) {
     var target = _.last(this.path);
     var direction = temp.copy(target.position).sub(this.current.position);
     this.acceleration.copy(direction).multiplyScalar(0.1);
+    if (direction.x !== 0 && direction.y !== 0) this.acceleration.multiplyScalar(1 / SQUARE_ROOT_2);
     if (temp.copy(this.position).multiplyScalar(1 / this.tileSize).floor().equals(target.position)) {
       this.current.highlight--;
       this.current = this.path.pop();
