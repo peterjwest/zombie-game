@@ -74,15 +74,8 @@ Level.prototype.wallInDirection = function(position, direction) {
   }
 };
 
-Level.prototype.findPath = function(entity, target) {
-  var route = pathfind(this, entity.current, target);
-  if (route !== false) entity.path = route;
-  return route !== false;
-};
-
 Level.prototype.random = function() {
-  var row = this.data[Math.floor(Math.random() * this.data.length)];
-  return row[Math.floor(Math.random() * row.length)];
+  return random.pick(random.pick(this.data));
 };
 
 Level.prototype.computeNeighbours = function() {

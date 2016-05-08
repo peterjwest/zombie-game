@@ -1,3 +1,5 @@
+random.seed(0);
+
 // Creates a randomised level
 var data = _.times(16, function(y) {
   return _.times(16, function(x) {
@@ -22,15 +24,13 @@ var temp = V2();
 
 level.computeNeighbours();
 
-var entities = _.times(500, function() {
+var entities = _.times(30, function() {
   return new Entity(16);
 });
 entities.map(function(entity) {
   entity.setPosition(current);
-  entity.path = [current];
+  entity.path = [];
 });
-
-current.highlight = 500;
 
 var step = function() {
   entities.map(function(entity) {
@@ -40,3 +40,4 @@ var step = function() {
   window.requestAnimationFrame(step);
 };
 step();
+
