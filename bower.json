@@ -7,7 +7,8 @@
   "description": "Prototype zombie game",
   "dependencies": {
     "threejs": "r76",
-    "lodash": "4.11.2"
+    "lodash": "4.11.2",
+    "random": "1.0.8"
   },
   "private": true
 }
