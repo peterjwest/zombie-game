@@ -1,14 +1,16 @@
 random.seed(0);
 
 // Creates a randomised level
-var data = _.times(16, function(y) {
-  return _.times(16, function(x) {
+var data = _.times(14, function(y) {
+  return _.times(14, function(x) {
+    var start = (x === 0 && (y === 0 || y === 1));
+    var outOfBounds = x - y > 6 || y - x > 6;
     return {
       position: V2(x, y),
-      ground: x === 0 && y === 0 ? 1 : Math.random() > 0.05,
+      ground: outOfBounds ? 0 : (start ? 1 : random.boolean(0.95)),
       walls: {
-        x: x === 0 && y === 0 ? 0 : Math.random() > 0.8,
-        y: x === 0 && y === 0 ? 0 : Math.random() > 0.8,
+        x: outOfBounds || start ? 0 : random.boolean(0.2),
+        y: outOfBounds || start ? 0 : random.boolean(0.2),
       },
       highlight: 0,
     };
