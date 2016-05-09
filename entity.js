@@ -5,7 +5,7 @@ var Entity = function(tileSize) {
   this.acceleration = V2();
   this.path = [];
   this.center = V2(this.tileSize/2 - 2, this.tileSize/2 - 2);
-  this.offset = V2(random.float(0.1, 0.1), random.float(0.1, 0.1));
+  this.offset = V2(random.float(-0.2, 0.2), random.float(-0.2, 0.2));
   this.currentTile = V2();
   this.targetTile = null;
   this.targetTime = 0;
@@ -13,7 +13,7 @@ var Entity = function(tileSize) {
   this.progress = 0;
 
   this.waiting = 0;
-  this.speed = 0.75 + random.float(1);
+  this.speed = 0.75 + random.float(0.5);
 };
 
 Entity.prototype.setPosition = function(tile) {
