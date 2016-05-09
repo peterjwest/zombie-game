@@ -18,17 +18,19 @@ Renderer.prototype.render = function(level, entities) {
 
   var self = this;
   var items = entities.map(function(entity) {
-    var coords = self.screenCoordinates(entity.position.clone().multiplyScalar(1 / level.tileSize));
-    return ['entity', coords.x + 110 + 15, coords.y + 10 - 24];
+    var coords = self.screenCoordinates(temp.copy(entity.position).multiplyScalar(1 / level.tileSize).sub(V2(0.5, 0.5)));
+    return ['entity', coords.x + 110, coords.y + 10];
   });
 
   level.iterate(function(tile) {
-    var coords = self.screenCoordinates(tile.position);
+    if (tile.walls.x || tile.walls.y) {
+      var coords = self.screenCoordinates(tile.position);
+    }
     if (tile.walls.x) {
-      items.push(['wall-x', coords.x + 110 - 1, coords.y + 10 - 10]);
+      items.push(['wall-x', coords.x + 110, coords.y + 10]);
     }
     if (tile.walls.y) {
-      items.push(['wall-y', coords.x + 110 + 18, coords.y + 10 - 10]);
+      items.push(['wall-y', coords.x + 110, coords.y + 10]);
     }
   });
 
@@ -36,13 +38,12 @@ Renderer.prototype.render = function(level, entities) {
     return a[2] === b[2] ? a[1] - b[1] : a[2] - b[2];
   });
 
-
   items.forEach(function(item) {
     if (item[0] === 'wall-x' || item[0] === 'wall-y') {
-      self.renderTileWall(item[0], item[1], item[2]);
+      self.renderTileWall(item[0], item[1] + (item[0] === 'wall-x' ? -1 : 16), item[2] - 10);
     }
     if (item[0] === 'entity') {
-      self.renderEntity(item[1], item[2]);
+      self.renderEntity(item[1] + 13, item[2] - 17);
     }
   });
 };
