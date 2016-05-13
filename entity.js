@@ -1,4 +1,7 @@
+var ENTITY_ID = 1;
+
 var Entity = function(tileSize) {
+  this.id = ENTITY_ID++;
   this.tileSize = tileSize;
   this.position = V2();
   this.velocity = V2();
@@ -6,7 +9,7 @@ var Entity = function(tileSize) {
   this.path = [];
   this.center = V2(this.tileSize/2 - 2, this.tileSize/2 - 2);
   this.offset = V2(random.float(-0.2, 0.2), random.float(-0.2, 0.2));
-  this.currentTile = V2();
+  this.currentTile = null;
   this.targetTile = null;
   this.targetTime = 0;
   this.targetPosition = V2();
@@ -17,7 +20,9 @@ var Entity = function(tileSize) {
 };
 
 Entity.prototype.setPosition = function(tile) {
+  if (this.currentTile) this.currentTile.removeEntity(this);
   this.currentTile = tile;
+  if (this.currentTile) this.currentTile.addEntity(this);
   this.position.copy(tile.position).multiplyScalar(this.tileSize).add(this.center).add(this.offset);
   this.targetPosition.copy(this.position);
 };
@@ -27,15 +32,17 @@ var temp = V2();
 Entity.prototype.update = function(level) {
   // Set the next tile target
   if (!this.targetTile && this.path.length) {
-    this.targetTile = this.path.pop();
+    if (_.last(this.path).entityCount < 1) {
+      this.targetTile = this.path.pop();
 
-    if (this.targetTile === this.currentTile) {
-      return this.targetTile = null;
+      if (this.targetTile === this.currentTile) {
+        return this.targetTile = null;
+      }
+
+      this.progress = 0;
+      var manhattanDist = temp.copy(this.targetTile.position).sub(this.currentTile.position).lengthManhattan();
+      this.targetTime = 20 / this.speed * (manhattanDist === 2 ? SQUARE_ROOT_2 : 1);
     }
-
-    this.progress = 0;
-    var manhattanDist = temp.copy(this.targetTile.position).sub(this.currentTile.position).lengthManhattan();
-    this.targetTime = 20 / this.speed * (manhattanDist === 2 ? SQUARE_ROOT_2 : 1);
   }
   // Animate to the target
   if (this.targetTile) {
@@ -50,7 +57,9 @@ Entity.prototype.update = function(level) {
     this.targetPosition.multiplyScalar(this.tileSize).add(this.center);
 
     if (ratio === 1) {
+      if (this.currentTile) this.currentTile.removeEntity(this);
       this.currentTile = this.targetTile;
+      if (this.currentTile) this.currentTile.addEntity(this);
       this.targetTile = null;
     }
   }

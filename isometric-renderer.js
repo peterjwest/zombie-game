@@ -1,5 +1,8 @@
 var images = {
   tile: document.getElementById('tile'),
+  'tile-1': document.getElementById('tile-1'),
+  'tile-2': document.getElementById('tile-2'),
+  'tile-3': document.getElementById('tile-3'),
   'tile-blocked': document.getElementById('tile-blocked'),
   'wall-x': document.getElementById('wall-x'),
   'wall-y': document.getElementById('wall-y'),
@@ -50,7 +53,7 @@ Renderer.prototype.render = function(level, entities) {
 
 Renderer.prototype.renderTile = function(tile) {
   var coords = this.screenCoordinates(tile.position);
-  this.context.drawImage(images[tile.ground ? 'tile' : 'tile-blocked'], coords.x + 110, coords.y + 10);
+  this.context.drawImage(images[tile.entityCount > 0 ? 'tile-'+Math.min(tile.entityCount, 3) : (tile.ground ? 'tile' : 'tile-blocked')], coords.x + 110, coords.y + 10);
 };
 
 Renderer.prototype.renderTileWall = function(type, x, y) {

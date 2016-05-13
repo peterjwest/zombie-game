@@ -1,6 +1,5 @@
-var Level = function(data, tileSize) {
-  this.data = data;
-  this.tileSize = tileSize;
+var Level = function(data) {
+  _.assign(this, _.pick(data, ['tiles', 'tileSize']));
 };
 
 Level.prototype.default = { ground: false, walls: {}};
@@ -10,14 +9,14 @@ Level.prototype.get = function(x, y) {
     y = x.y;
     x = x.x;
   }
-  if (this.data[y] === undefined || this.data[y][x] === undefined) {
+  if (this.tiles[y] === undefined || this.tiles[y][x] === undefined) {
     return this.default;
   }
-  return this.data[y][x];
+  return this.tiles[y][x];
 };
 
 Level.prototype.iterate = function(callback) {
-  this.data.forEach(function(row) {
+  this.tiles.forEach(function(row) {
     row.forEach(callback);
   });
 };
@@ -75,7 +74,7 @@ Level.prototype.wallInDirection = function(position, direction) {
 };
 
 Level.prototype.random = function() {
-  return random.pick(random.pick(this.data));
+  return random.pick(random.pick(this.tiles));
 };
 
 Level.prototype.computeNeighbours = function() {
