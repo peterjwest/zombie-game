@@ -12,7 +12,6 @@ var data = _.times(14, function(y) {
         x: outOfBounds || start ? 0 : random.boolean(0.2),
         y: outOfBounds || start ? 0 : random.boolean(0.2),
       },
-      highlight: 0,
     };
   });
 });

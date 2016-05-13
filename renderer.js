@@ -12,8 +12,8 @@ Renderer.prototype.render = function(level, entities) {
 };
 
 Renderer.prototype.renderTile = function(tile) {
-  this.context.fillStyle = tile.highlight > 0 ? "rgb(200, 200, 255)" : (tile.ground ? "rgb(160, 200, 100)" : "rgb(120, 120, 100)");
-  this.context.strokeStyle= "rgb(50, 50, 50)";
+  this.context.fillStyle = tile.ground ? "rgb(160, 200, 100)" : "rgb(120, 120, 100)";
+  this.context.strokeStyle = "rgb(50, 50, 50)";
   this.context.fillRect(
     tile.position.x * level.tileSize,
     tile.position.y * level.tileSize,
